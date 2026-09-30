@@ -1,9 +1,9 @@
 <template>
     <div class="about-chanel-wrapper px-1 py-1 ">
         <h2 class="about-chanel__title text-xl font-medium mb-2">Главная</h2>
-        <div class="about-chanel__main w-full grid grid-cols-2 shadow-md rounded-xl mb-2">
+        <div class="about-chanel__main w-full grid grid-cols-2 shadow-md rounded-xl mb-2  border border-[#c6c6c6] ">
             <a class="about-chanel__video-link relative" href="#">
-                <img class="about-chanel__video-img w-full h-90 rounded-l-xl"
+                <img class="about-chanel__video-img w-full h-90 rounded-xl"
                     src="../../../../images/themes/green-black.jpg" alt="Фоновая изображение канала">
                 <div
                     class="about-chanel__video-decoration absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-full w-18 h-18 bg-black/30  backdrop-blur-xs hover:bg-black/60">
@@ -13,7 +13,7 @@
                 </div>
             </a>
 
-            <div class="about-chanel__content flex flex-col rounded-r-xl w-full h-90 border border-[#c6c6c6] p-3">
+            <div class="about-chanel__content flex flex-col rounded-r-xl w-full h-90 p-3">
                 <div class="about-chanel__content-top flex justify-between">
                     <h3 class="about-chanel__title text-lg font-medium">О канале</h3>
                     <div class="about-chanel__parcel flex items-center gap-2 mb-1">
