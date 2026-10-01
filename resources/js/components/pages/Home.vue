@@ -1,16 +1,16 @@
 <template>
     <div class="chat flex flex-col h-screen scrollbar-hidden overflow-x-hidden">
-        <MainPageFunctions></MainPageFunctions>
+        <!-- <MainPageFunctions></MainPageFunctions> -->
         <!-- Для канала и главной и видеоплеера и аддинки (шапка веб-приложения) -->
         <!-- Для чата -->
-        <!-- <ChatPageFunctions></ChatPageFunctions> -->
+        <ChatPageFunctions></ChatPageFunctions>
 
         <div class="">
             <!-- Для чата -->
-            <!-- <Chat></Chat> -->
+            <Chat></Chat>
             <!-- Для канала -->
             <!-- <MainContent></MainContent> -->
-            <Chanel></Chanel>
+            <!-- <Chanel></Chanel> -->
             <!-- <Player></Player> -->
 
         </div>

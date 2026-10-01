@@ -1,8 +1,7 @@
 <template>
     <form
         class="conversation-panel shadow-md sticky bottom-1 z-5 flex flex-col justify-center w-[75%] bg-white mx-auto rounded-xl px-3 py-2 mb-2">
-        <textarea class="conversation-panel__textarea mb-1.5" name="conversation-input" id="conversation-input"
-            placeholder="Сообщение..."></textarea>
+        <EditorContent class="conversation-panel__textarea mb-1.5 outline-none" :editor="editor" />
         <div v-if="has_message" class="conversation-panel__functions conversation-functions flex justify-between">
             <div class="btn-left__wrapper flex items-center">
                 <button type="button"
@@ -82,7 +81,7 @@
                     </button>
                 </div>
                 <form class="delay-block__time grid grid-cols-[1fr_34px] items-center gap-2">
-                    <div class="delay-block__time-inputs relative flex items-center gap-3">
+                    <div class="delay-block__time-inputs relative flex items-center gap-2">
                         <div
                             class="delay-block__input-wrapper border transition-background duration-150 z-2 bg-gray-100 border-gray-100 rounded-xl py-1 flex items-center">
                             <input v-model="year"
@@ -111,7 +110,7 @@
                         </div>
                     </div>
                     <button type="button"
-                        class="delay-block__submit p-1 bg-indigo-900 rounded-xl focus:outline-indigo-900 focus:outline-2 cursor-pointer">
+                        class="delay-block__submit p-1 rounded-xl bg-black focus:outline-2 cursor-pointer">
                         <svg width="24" height="24" color="#fff">
                             <use href="#good"></use>
                         </svg>
@@ -130,7 +129,7 @@
                             <use :href="active_ai_svg"></use>
                         </svg>
                         <span ref="active_ai_name" class="ai-block__active-name mb-0.5 block">{{ this.active_ai_name
-                        }}</span>
+                            }}</span>
                     </div>
                     <Transition name="ai-models">
                         <div v-show="ai_models_opened"
@@ -394,7 +393,7 @@
                         <li @click="toggleRedactorRule('crossed')" class="editor__text-function h-full">
                             <button type="button"
                                 :class="['editor__btn relative bg-transparent rounded-lg flex justify-center items-center py-1 pt-0.75 px-2 cursor-pointer', redactor_rules.includes('crossed') ? 'active' : '']"
-                                aria-label="Выделить зачёркнутым шрифтом" data-tooltip="Зачёркнутый   Ctrl + Z">
+                                aria-label="Выделить зачёркнутым шрифтом" data-tooltip="Зачёркнутый   Ctrl + Shift + S">
                                 <svg class="" width="24" height="24">
                                     <use href="#text-crossed"></use>
                                 </svg>
@@ -419,22 +418,17 @@
                             </button>
                         </li>
                         <div
-                            :class="['editor__link editor__window absolute bg-white p-1.5 rounded-xl shadow-md  -top-31 left-42', redactor_windows.includes('link') ? 'active' : '']">
+                            :class="['editor__link editor__window absolute bg-white p-1.5 rounded-xl shadow-md w-50 -top-30 left-42 pt-2', redactor_windows.includes('link') ? 'active' : '']">
                             <div class="editor__link-block flex flex-col gap-0.5">
-                                <input
-                                    class="editor__link-url border-b border-gray-400 p-0.5 pl-1 outline-none  placeholder:text-neutral-700 w-full"
-                                    type="text" placeholder="Url-адрес сервиса">
-                                <div
-                                    class="editor__link-text p-0.5 pl-1 border-b border-gray-400 flex items-center gap-0.5 mb-4">
-                                    <input class="outline-none placeholder:text-neutral-700" type="text"
-                                        placeholder="Текст ссылки">
-                                    <input title="Цвет" class="editor__link-color w-5 h-4.75 rounded-full" type="color"
-                                        value="#155dfc">
-                                    <input title="Фон" class="editor__link-color w-5 h-4.75 rounded-full" type="color"
-                                        value="#d1d5dc">
-                                </div>
-                                <button
-                                    class="p-0.5 bg-black/80 rounded-xl text-white active:opacity-70 cursor-pointer">Вставить</button>
+                                <Input v-model="new_link_url" id="new_link_url" class="mb-0.5"
+                                    label="Url-адрес"></Input>
+
+                                <Input v-model="new_link_text" id="new_link_text" class="mb-1"
+                                    label="Текст ссылки"></Input>
+
+                                <button @click.prevent="createLink"
+                                    class="p-0.5 bg-black/80 rounded-xl text-white active:opacity-70 cursor-pointer w-1/2 ml-auto"
+                                    type="button">Вставить</button>
                             </div>
                         </div>
 
@@ -506,21 +500,21 @@
                             :class="['editor__typography-titles editor__window py-2 px-1 bg-white absolute -top-24 -right-34 w-60 rounded-xl shadow-md', redactor_windows.includes('title') ? 'active' : '']">
                             <li class="editor__typography-title">
                                 <button type="button"
-                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:outline-2 focus:outline-indigo-900">
+                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:bg-[#5353533f]">
                                     <span class="text-neutral-500 font-medium text-md">H1</span>
                                     <p class="text-sm">Главный заголовок</p>
                                 </button>
                             </li>
                             <li class="editor__typography-title">
                                 <button type="button"
-                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:outline-2 focus:outline-indigo-900">
+                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:bg-[#5353533f]">
                                     <span class="text-neutral-500 font-medium text-md">H2</span>
                                     <p class="text-sm">Основной заголовок</p>
                                 </button>
                             </li>
                             <li class="editor__typography-title">
                                 <button type="button"
-                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:outline-2 focus:outline-indigo-900">
+                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:bg-[#5353533f]">
                                     <span class="text-neutral-500 font-medium text-md">H3</span>
                                     <p class="text-sm">Второстепенный заголовок</p>
                                 </button>
@@ -530,7 +524,7 @@
                             :class="['editor__typography-lists editor__window py-2 px-1 bg-white absolute -top-29 left-15 w-55 rounded-xl shadow-md', redactor_windows.includes('list') ? 'active' : '']">
                             <li class="editor__typography-list">
                                 <button type="button"
-                                    class="w-full flex items-center gap-1 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:outline-2 focus:outline-indigo-900">
+                                    class="w-full flex items-center gap-1 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:bg-[#5353533f]">
                                     <svg class="" width="24" height="24">
                                         <use href="#classik-list"></use>
                                     </svg>
@@ -539,7 +533,7 @@
                             </li>
                             <li class="editor__typography-list">
                                 <button type="button"
-                                    class="w-full flex items-center gap-1 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:outline-2 focus:outline-indigo-900">
+                                    class="w-full flex items-center gap-1 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:bg-[#5353533f]">
                                     <svg class="" width="24" height="24">
                                         <use href="#number-list"></use>
                                     </svg>
@@ -548,7 +542,7 @@
                             </li>
                             <li class="editor__typography-list">
                                 <button type="button"
-                                    class="w-full flex items-center gap-1 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:outline-2 focus:outline-indigo-900">
+                                    class="w-full flex items-center gap-1 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:bg-[#5353533f]">
                                     <svg class="" width="24" height="24">
                                         <use href="#task-list"></use>
                                     </svg>
@@ -557,7 +551,7 @@
                             </li>
                             <li class="editor__typography-list">
                                 <button type="button"
-                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:outline-2 focus:outline-indigo-900">
+                                    class="w-full flex items-center gap-2 cursor-pointer hover:bg-[#efefef] rounded-md pl-1 focus:bg-[#5353533f]">
                                     <svg class="" width="20" height="20">
                                         <use href="#analysis"></use>
                                     </svg>
@@ -567,23 +561,23 @@
                         </ul>
                     </div>
                     <div class="editor__position flex">
-                        <button @click="toggleRedactorRule('text-left')" type="button"
-                            class="editor__btn editor__btn--text-left relative bg-transparent rounded-r-lg flex justify-center items-center py-1 px-2 pt-0.75 cursor-pointer"
-                            data-tooltip="Слева" aria-label="Создать кастомную ссылку">
+                        <button @click="toggleRedactorCentering('left')" type="button"
+                            class="editor__btn editor__btn--text-left transition-colors duration-250 relative bg-transparent rounded-r-lg flex justify-center items-center py-1 px-2 pt-0.75 cursor-pointer"
+                            data-tooltip="Слева Ctrl + Shift + L" aria-label="Создать кастомную ссылку">
                             <svg class="" width="24" height="24">
                                 <use href="#text-left"></use>
                             </svg>
                         </button>
-                        <button @click="toggleRedactorRule('text-center')" type="button"
-                            :class="['editor__btn relative bg-transparent rounded-lg flex justify-center items-center py-1 px-2 pt-0.75 cursor-pointer', redactor_rules.includes('text-center') ? 'active' : '']"
-                            data-tooltip="По центру" aria-label="Создать кастомную ссылку">
+                        <button @click="toggleRedactorCentering('center')" type="button"
+                            :class="['editor__btn relative bg-transparent rounded-lg flex justify-center items-center py-1 px-2 pt-0.75 cursor-pointer', redactor_centering === 'center' ? 'active' : '']"
+                            data-tooltip="По центру Ctrl + Shift + E" aria-label="Создать кастомную ссылку">
                             <svg class="" width="24" height="24">
                                 <use href="#text-center"></use>
                             </svg>
                         </button>
-                        <button @click="toggleRedactorRule('text-right')" type="button"
-                            :class="['editor__btn relative bg-transparent rounded-lg flex justify-center items-center py-1 px-2 pt-0.75 cursor-pointer', redactor_rules.includes('text-right') ? 'active' : '']"
-                            data-tooltip="Справа" aria-label="Создать кастомную ссылку">
+                        <button @click="toggleRedactorCentering('right')" type="button"
+                            :class="['editor__btn relative bg-transparent rounded-lg flex justify-center items-center py-1 px-2 pt-0.75 cursor-pointer', redactor_centering === 'right' ? 'active' : '']"
+                            data-tooltip="Справа Ctrl + Shift + R" aria-label="Создать кастомную ссылку">
                             <svg class="" width="24" height="24">
                                 <use href="#text-right"></use>
                             </svg>
@@ -596,9 +590,19 @@
 </template>
 
 <script>
+import { Editor, EditorContent } from '@tiptap/vue-3'
+import Input from "../../ui/buttons/Input.vue"
+import StarterKit from '@tiptap/starter-kit'
+import TextAlign from '@tiptap/extension-text-align'
+import Link from '@tiptap/extension-link'
 
 export default {
     name: "ConversationPanel",
+
+    components: {
+        EditorContent,
+        Input,
+    },
 
     data() {
         //* Модель нейросети и правила нейросети можно получать из настроек пользователя...
@@ -637,9 +641,13 @@ export default {
             hour: null,
             minute: null,
             // Запись текстовый редактор на данный момент
+            editor: null,
             redactor_opened: false,
-            redactor_rules: [],
             redactor_windows: [],
+            redactor_rules: [],
+            redactor_centering: 'left',
+            new_link_url: '',
+            new_link_text: '',
         }
     },
 
@@ -651,6 +659,24 @@ export default {
             return this.formatTime(this.duration);
         },
     },
+
+    mounted() {
+        this.editor = new Editor({
+            extensions: [
+                StarterKit,
+                TextAlign.configure({
+                    types: ['paragraph', 'heading'],
+                }),
+                Link.configure({
+                    openOnClick: false
+                }),
+            ],
+
+
+            content: '<p>Сообщение...</p>',
+        })
+    },
+
 
     methods: {
         // Функционал блок откладки
@@ -948,7 +974,72 @@ export default {
             } else {
                 this.redactor_rules.splice(index, 1)
             }
+
+            this.applyRedactorRule(name)
+            console.log(this.redactor_rules)
         },
+
+        applyRedactorRule(name) {
+            switch (name) {
+                case 'bold':
+                    this.editor.chain().focus().toggleBold().run()
+                    break
+
+                case 'italic':
+                    this.editor.chain().focus().toggleItalic().run()
+                    break
+
+                case 'underline':
+                    this.editor.chain().focus().toggleUnderline().run()
+                    break
+
+                case 'crossed':
+                    this.editor.chain().focus().toggleStrike().run()
+                    break
+            }
+        },
+
+        toggleRedactorCentering(name) {
+            this.redactor_centering = name
+
+            this.editor
+                .chain()
+                .focus()
+                .setTextAlign(name)
+                .run()
+        },
+
+        createLink() {
+            const url = this.new_link_url
+            const text = this.new_link_text
+
+            console.log('URL:', url)
+            console.log('TEXT:', text)
+
+            if (!url || !text || !this.editor) {
+                return
+            }
+
+            this.editor
+                .chain()
+                .focus()
+                .insertContent({
+                    type: 'text',
+                    text: text,
+                    marks: [
+                        {
+                            type: 'link',
+                            attrs: {
+                                href: url
+                            }
+                        }
+                    ]
+                })
+                .run()
+
+            this.new_link_url = ''
+            this.new_link_text = ''
+        }
     }
 }
 
@@ -962,17 +1053,37 @@ export default {
 
 .conversation-panel__textarea {
     min-height: 1.1rem;
-    transition: height 300ms ease;
-    field-sizing: content;
-    interpolate-size: allow-keywords;
     padding-bottom: 2px;
     font-size: 1.1rem;
-    border-bottom: 1px solid oklch(70.7% 0.022 261.325);
-    overflow: hidden;
-    resize: none;
-    outline: none;
-    box-sizing: border-box;
+    /* border-bottom: 1px solid #000; */
 }
+
+.conversation-panel__textarea :deep(.ProseMirror:focus) {
+    outline: none;
+}
+
+.conversation-panel__textarea :deep(.ProseMirror a) {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    color: #3B82F6;
+    cursor: pointer;
+}
+
+.conversation-panel__textarea :deep(.ProseMirror a:hover) {
+    text-decoration-color: #3B82F6;
+    cursor: pointer;
+}
+
+.conversation-panel__textarea :deep(.ProseMirror a:focus) {
+    text-decoration-color: transparent;
+    cursor: pointer;
+}
+
+
+.conversation-panel__textarea :deep(.ProseMirror a:visited) {
+    color: #7c3aed;
+}
+
 
 .conversation-panel__btn:hover {
     transition: background-color 100ms ease;

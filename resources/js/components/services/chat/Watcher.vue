@@ -86,7 +86,7 @@
             </button>
 
             <div class="rounded-xl origin-center overflow-auto h-full min-h-0 scrollbar-hidden">
-                <img ref="image" class="watcher__image w-full object-contain"
+                <img ref="image" class="watcher__image w-full transition-transform duration-200 object-contain"
                     src="../../../../images/themes/green-black.jpg">
             </div>
             <button
