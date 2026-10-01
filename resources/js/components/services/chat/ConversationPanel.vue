@@ -437,14 +437,16 @@
                             <div class="editor__colors-color flex items-center justify-between">
                                 <span class="font-medium">Цвет</span>
                                 <div>
-                                    <button type="button"
+                                    <button @click="toggleColor('color', 'oklch(45.3% 0.124 130.933)')" type="button"
                                         class="w-4.5 h-4.5 bg-lime-800 rounded-full cursor-pointer"></button>
-                                    <button type="button"
+                                    <button @click="toggleColor('color', 'oklch(51.4% 0.222 16.935)')" type="button"
                                         class="w-4.5 h-4.5 bg-rose-700 rounded-full cursor-pointer"></button>
-                                    <button type="button"
+                                    <button @click="toggleColor('color', 'oklch(68.5% 0.169 237.323)')" type="button"
                                         class="w-4.5 h-4.5 bg-sky-500 rounded-full cursor-pointer"></button>
-                                    <button type="button"
+                                    <button @click="toggleColor('color', 'oklch(43.2% 0.232 292.759)')" type="button"
                                         class="w-4.5 h-4.5 bg-violet-800 rounded-full cursor-pointer"></button>
+                                    <button @click="toggleColor('color', '#000')" type="button"
+                                        class="w-4.5 h-4.5 bg-black rounded-full cursor-pointer"></button>
                                     <button title="Выбрать свой цвет" type="button"
                                         class="p-0.75 cursor-pointer rounded-full hover:bg-white">
                                         <svg class="" width="20" height="20">
@@ -456,14 +458,17 @@
                             <div class="editor__colors-color flex items-center justify-between">
                                 <span class="font-medium">Фон </span>
                                 <div>
-                                    <button type="button"
+                                    <button @click="toggleColor('background', '#dcfce7')" type="button"
                                         class="w-4.5 h-4.5 bg-green-100 rounded-full cursor-pointer"></button>
-                                    <button type="button"
+                                    <button @click="toggleColor('background', 'oklch(94.1% 0.03 12.58)')" type="button"
                                         class="w-4.5 h-4.5 bg-rose-100 rounded-full cursor-pointer"></button>
-                                    <button type="button"
+                                    <button @click="toggleColor('background', '#dff2fe')" type="button"
                                         class="w-4.5 h-4.5 bg-sky-100 rounded-full cursor-pointer"></button>
-                                    <button type="button"
+                                    <button @click="toggleColor('background', 'oklch(89.4% 0.057 293.283)')"
+                                        type="button"
                                         class="w-4.5 h-4.5 bg-violet-200 rounded-full cursor-pointer"></button>
+                                    <button @click="toggleColor('background', 'transparent')" type="button"
+                                        class="w-4.5 h-4.5 bg-white border rounded-full cursor-pointer"></button>
 
                                     <button title="Выбрать свой фон" type="button"
                                         class="p-0.75 cursor-pointer rounded-full hover:bg-white">
@@ -595,6 +600,9 @@ import Input from "../../ui/buttons/Input.vue"
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import Link from '@tiptap/extension-link'
+import {TextStyle} from '@tiptap/extension-text-style'
+import Color from '@tiptap/extension-color'
+import Highlight from '@tiptap/extension-highlight'
 
 export default {
     name: "ConversationPanel",
@@ -669,6 +677,11 @@ export default {
                 }),
                 Link.configure({
                     openOnClick: false
+                }),
+                Color,
+                TextStyle,
+                Highlight.configure({
+                    multicolor: true,
                 }),
             ],
 
@@ -1013,13 +1026,6 @@ export default {
             const url = this.new_link_url
             const text = this.new_link_text
 
-            console.log('URL:', url)
-            console.log('TEXT:', text)
-
-            if (!url || !text || !this.editor) {
-                return
-            }
-
             this.editor
                 .chain()
                 .focus()
@@ -1039,6 +1045,28 @@ export default {
 
             this.new_link_url = ''
             this.new_link_text = ''
+        },
+
+        toggleColor(name, color) {
+            if (!this.editor || !color) {
+                return
+            }
+
+            if (name === 'color') {
+                this.editor
+                    .chain()
+                    .focus()
+                    .setColor(color)
+                    .run()
+            } else if (name === 'background') {
+                this.editor
+                    .chain()
+                    .focus()
+                    .setHighlight({
+                        color: color
+                    })
+                    .run()
+            }
         }
     }
 }
@@ -1055,7 +1083,7 @@ export default {
     min-height: 1.1rem;
     padding-bottom: 2px;
     font-size: 1.1rem;
-    /* border-bottom: 1px solid #000; */
+    border-bottom: 1px solid #c6c6c6;
 }
 
 .conversation-panel__textarea :deep(.ProseMirror:focus) {
